@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Crosshair, Skull, Zap, Crown, BarChart3, ChevronRight } from 'lucide-react';
 import { Player } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { PlayerName } from '@/components/PlayerName';
 
 interface PlayerMobileCardProps {
   player: Player;
@@ -49,7 +50,7 @@ export function PlayerMobileCard({ player, rank, onSelectPlayer }: PlayerMobileC
 
         <div className="flex flex-col flex-grow">
           <span className="font-bold text-white text-lg tracking-wide flex items-center justify-between">
-            {player.name}
+            <PlayerName uuid={player.uuid} initialName={player.name} />
             <ChevronRight size={16} className="text-white/30" />
           </span>
           <div className="flex items-center gap-2 mt-1">

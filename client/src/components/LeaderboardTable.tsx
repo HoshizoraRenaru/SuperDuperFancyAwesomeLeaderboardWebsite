@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Trophy, Skull, Crosshair, Zap, Crown, ChevronUp, ChevronDown } from 'lucide-react';
 import { Player } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { PlayerName } from '@/components/PlayerName';
 
 interface LeaderboardTableProps {
   players: Player[];
@@ -125,7 +126,7 @@ export function LeaderboardTable({ players: initialPlayers, onSelectPlayer }: Le
                       </div>
                       <div className="flex flex-col">
                         <span className="font-bold text-white text-lg tracking-wide group-hover:text-primary transition-colors">
-                          {player.name}
+                          <PlayerName uuid={player.uuid} initialName={player.name} />
                         </span>
                         <div className="flex items-center gap-2">
                            <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">

@@ -4,6 +4,7 @@ import { Player } from "@/data/mockData";
 import { motion } from "framer-motion";
 import { Trophy, Skull, Crosshair, Zap, Crown, Calendar, TrendingUp, Activity, User } from 'lucide-react';
 import { format } from 'date-fns';
+import { PlayerName } from "@/components/PlayerName";
 
 interface PlayerDetailsModalProps {
   player: Player | null;
@@ -50,7 +51,7 @@ export function PlayerDetailsModal({ player, isOpen, onClose }: PlayerDetailsMod
               transition={{ delay: 0.1 }}
             >
               <DialogTitle className="text-3xl font-display font-bold flex items-center gap-3">
-                {player.name}
+                <PlayerName uuid={player.uuid} initialName={player.name} />
                 <span className="text-sm font-mono font-normal px-2 py-1 rounded bg-white/10 text-muted-foreground border border-white/5 uppercase tracking-wider">
                   {player.group}
                 </span>
