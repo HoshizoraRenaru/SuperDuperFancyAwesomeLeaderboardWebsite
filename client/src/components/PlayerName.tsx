@@ -15,41 +15,32 @@ export function PlayerName({ uuid, initialName, className }: PlayerNameProps) {
   const [loading, setLoading] = useState(!name && !initialName);
 
   useEffect(() => {
-    // If we already have a valid name (and it's not just the UUID again), use it
-    if (initialName && initialName !== uuid) {
-      setName(initialName);
-      return;
-    }
-
-    // Check cache
-    if (nameCache[uuid]) {
-      setName(nameCache[uuid]);
-      setLoading(false);
-      return;
-    }
-
-    // If no name, fetch it
     let isMounted = true;
+
+    // Always fetch to ensure freshness, even if initialName is provided.
+    // This fixes issues where the backend might send an old cached username.
     const fetchName = async () => {
-      setLoading(true);
+      // Only set loading if we don't have a name yet to avoid flickering
+      if (!name) setLoading(true);
+      
       try {
-        // Using Ashcon's API which is generally CORS-friendly for Minecraft lookups
-        // Fallback to playerdb if needed in production logic, but this is a solid start
+        // 1. Try Ashcon API (Fast, usually up-to-date)
         const response = await fetch(`https://api.ashcon.app/mojang/v2/user/${uuid}`);
         if (response.ok) {
           const data = await response.json();
           if (data.username && isMounted) {
             nameCache[uuid] = data.username;
-            setName(data.username);
+            // Only update if different to avoid re-renders
+            if (data.username !== name) setName(data.username);
           }
         } else {
-            // Fallback: Try a different API if the first one fails (rate limits etc)
+            // 2. Fallback to PlayerDB
             const backupRes = await fetch(`https://playerdb.co/api/player/minecraft/${uuid}`);
             if (backupRes.ok) {
                 const data = await backupRes.json();
                 if (data.data?.player?.username && isMounted) {
                     nameCache[uuid] = data.data.player.username;
-                    setName(data.data.player.username);
+                    if (data.data.player.username !== name) setName(data.data.player.username);
                 }
             }
         }
@@ -63,7 +54,7 @@ export function PlayerName({ uuid, initialName, className }: PlayerNameProps) {
     fetchName();
 
     return () => { isMounted = false; };
-  }, [uuid, initialName]);
+  }, [uuid, name]);
 
   if (loading) {
     return <span className={`animate-pulse opacity-50 ${className}`}>Loading...</span>;
