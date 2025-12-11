@@ -99,14 +99,14 @@ export function PlayerDetailsModal({ player, isOpen, onClose }: PlayerDetailsMod
                 <div className="w-full bg-black/50 h-2 rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: `${Math.min((player.level / 200) * 100, 100)}%` }} // Mock progress calculation
+                    animate={{ width: `${(player.xp % 1000) / 10}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
                     className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
                   />
                 </div>
                 <div className="flex justify-between mt-1 text-xs text-muted-foreground">
                   <span>Level {player.level}</span>
-                  <span>Next Level</span>
+                  <span>{(player.xp % 1000).toLocaleString()} / 1,000 XP</span>
                 </div>
               </div>
 
