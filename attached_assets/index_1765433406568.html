@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>⚡️ EternaL Hall Of Fame (Fancier) ⚡️</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Fancier Modern Theme */
+        body {
+            margin: 0;
+            /* Deep Space Background with subtle movement */
+            background: linear-gradient(135deg, #0a0a10 0%, #0d0d14 50%, #101018 100%);
+            font-family: 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 80px 0; /* Increased padding */
+            transition: background 0.5s;
+        }
+
+        /* Super Sized Heading - Electric Gradient */
+        h1 {
+            text-align: center;
+            margin-bottom: 70px;
+            font-size: 5rem; /* Even bigger */
+            font-weight: 900; /* Bolder */
+            letter-spacing: 5px;
+
+            /* Electric Gradient Text */
+            background: linear-gradient(90deg, #66e0ff, #a8dadc, #ff66e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(102, 224, 255, 0.6); /* More intense glow */
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 10px rgba(102, 224, 255, 0.4); }
+            100% { text-shadow: 0 0 25px rgba(102, 224, 255, 0.8); }
+        }
+
+        /* Leaderboard Container - Glassmorphism Effect */
+        .leaderboard {
+            width: 95%;
+            max-width: 1500px; /* Wider */
+            margin: 0 auto;
+            background: rgba(28, 28, 36, 0.8); /* Semi-transparent background */
+            backdrop-filter: blur(15px); /* Frosted Glass Effect */
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 24px; /* More rounded */
+            padding: 50px; /* More internal space */
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1); /* Deeper shadow, subtle inner border */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* Light border for glass effect */
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 1.3rem;
+        }
+
+        /* Table Headers - Sleeker, Subtle Border (FIXED for horizontal alignment) */
+        th {
+            padding: 25px 20px;
+            background: #282834;
+            color: #66e0ff;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 4px solid #457b9d;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            cursor: pointer;
+            transition: background 0.3s;
+
+            /* 핵심 수정: display: flex; 제거. 테이블 셀의 기본 수평 레이아웃 복구 */
+            text-align: center; /* 기본 정렬 */
+            position: relative; /* 화살표 위치 기준 */
+        }
+
+        /* 랭크(#) 열은 중앙 정렬 유지 */
+        th:first-child {
+            border-top-left-radius: 18px;
+            text-align: center;
+        }
+
+        /* 플레이어 열은 왼쪽 정렬 유지 */
+        th[data-sort-key="name"] {
+            text-align: left;
+        }
+
+        th:last-child {
+            border-top-right-radius: 18px;
+        }
+
+        th:hover {
+            background: #333342;
+        }
+
+        /* Sort Indicator Arrows - Directly next to text, using static positioning for inline flow */
+        th::after {
+            content: '';
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 0.9em;
+            vertical-align: middle;
+            transition: opacity 0.2s;
+            opacity: 0;
+
+            position: static; /* 텍스트 바로 옆에 붙도록 설정 */
+        }
+
+        /* 정렬 활성화된 헤더에만 화살표를 표시합니다. */
+        th.asc::after, th.desc::after {
+            opacity: 1;
+        }
+
+        th.asc::after {
+            content: ' ▲'; /* 텍스트와 띄어쓰기 추가 */
+            color: #ff66e0;
+        }
+        th.desc::after {
+            content: ' ▼'; /* 텍스트와 띄어쓰기 추가 */
+            color: #66e0ff;
+        }
+
+        /* Table Body Cells - Larger Padding, Darker lines */
+        td {
+            padding: 25px 20px;
+            border-bottom: 1px solid #333342;
+            color: #e0e0e0;
+            transition: background 0.3s ease-out, box-shadow 0.3s ease-out;
+            text-align: center; /* 셀 내용도 중앙 정렬 */
+        }
+        td:nth-child(2) {
+            text-align: left; /* 플레이어 열만 왼쪽 정렬 유지 */
+        }
+
+        /* Row Hover Effect - Subtle Lift and Glow */
+        tr:hover td {
+            background: #2a2a35;
+            box-shadow: inset 0 0 15px rgba(102, 224, 255, 0.1);
+            transform: translateY(-2px);
+            cursor: pointer;
+        }
+        tr:hover {
+            z-index: 5;
+            position: relative;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:last-child td:first-child { border-bottom-left-radius: 18px; }
+        tr:last-child td:last-child { border-bottom-right-radius: 18px; }
+
+
+        /* Player Column Styling */
+        .player {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        /* Player Head Image Styling - Futuristic, Cyber Border */
+        .player img {
+            width: 72px;
+            height: 72px;
+            border-radius: 10px;
+            border: 4px solid #66e0ff;
+            box-shadow: 0 0 15px rgba(102, 224, 255, 0.5), 0 4px 0 #000;
+            background: #333;
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+        tr:hover .player img {
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 0 0 25px rgba(255, 102, 224, 0.8), 0 4px 0 #000;
+            border-color: #ff66e0;
+        }
+
+        /* Player Name Text */
+        .player-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        /* Group/Small Text */
+        .group-name {
+            color: #999;
+            font-size: 1.1rem;
+            display: block;
+            font-weight: 400;
+        }
+
+        /* Rank Column */
+        td:nth-child(1) {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            width: 80px;
+            letter-spacing: -2px;
+        }
+        /* Top 3 coloring - Enhanced Glow */
+        .rank-gold { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 1); }
+        .rank-silver { color: #C0C0C0; text-shadow: 0 0 10px rgba(192, 192, 192, 1); }
+        .rank-bronze { color: #CD7F32; text-shadow: 0 0 10px rgba(205, 127, 50, 1); }
+
+        /* K/D Ratio Highlight - Neon Tech Look */
+        .kd-ratio {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #ff66e0;
+            text-shadow: 0 0 5px rgba(255, 102, 224, 0.8);
+        }
+
+        /* Last Seen Styling */
+        td:last-child {
+            font-size: 1.05rem;
+            color: #b0b0b0;
+        }
+
+        /* Last Update Footer - Prominent Glass Widget */
+        .update-timestamp {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            font-size: 1.0rem;
+            color: #c0c0c0;
+            padding: 12px 20px;
+            background: rgba(28, 28, 36, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            border-left: 4px solid #66e0ff; /* Accent line */
+        }
+
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 1300px) {
+            h1 { font-size: 4rem; }
+            .leaderboard { max-width: 95%; }
+            th, td { padding: 20px 15px; font-size: 1.2rem; }
+            .player img { width: 60px; height: 60px; }
+            .player-name { font-size: 1.4rem; }
+        }
+
+        @media (max-width: 900px) {
+            /* Hide less critical columns on small screens */
+            th:nth-child(6), td:nth-child(6),
+            th:nth-child(7), td:nth-child(7),
+            th:nth-child(9), td:nth-child(9),
+            th:nth-child(10), td:nth-child(10),
+            th:nth-child(11), td:nth-child(11) {
+                display: none;
+            }
+            h1 { font-size: 3rem; margin-bottom: 40px; letter-spacing: 3px; }
+            .leaderboard { padding: 30px 15px; }
+            th, td { padding: 15px 10px; font-size: 1.1rem; }
+            td:nth-child(1) { font-size: 2rem; width: 60px; }
+            .player img { width: 50px; height: 50px; }
+            .player-name { font-size: 1.25rem; }
+            .group-name { font-size: 1.0rem; }
+        }
+
+        @media (max-width: 550px) {
+            /* Hide more columns */
+            th:nth-child(8), td:nth-child(8) {
+                 display: none;
+            }
+            h1 { font-size: 2.2rem; }
+            .leaderboard { padding: 20px 10px; }
+            th, td { padding: 10px 5px; font-size: 1rem; }
+            .player-name { font-size: 1.1rem; }
+            .kd-ratio { font-size: 1.3rem; }
+        }
+    </style>
+
+</head>
+<body>
+
+<h1>EternaL S9.5 Hall Of Fame</h1>
+
+<div class="leaderboard">
+    <table>
+        <thead>
+        <tr>
+            <th data-sort-key="rank">#</th>
+            <th data-sort-key="name" class="sortable">플레이어</th>
+            <th data-sort-key="kills" class="sortable desc">킬</th>
+            <th data-sort-key="deaths" class="sortable">사망</th>
+            <th data-sort-key="kd" class="sortable">치사율</th>
+            <th data-sort-key="xp" class="sortable">경험치</th>
+            <th data-sort-key="level" class="sortable">레벨</th>
+            <th data-sort-key="killstreak" class="sortable">연속 킬</th>
+            <th data-sort-key="killstreak_top" class="sortable">최고 연속 킬</th>
+            <th data-sort-key="multiplier" data-sort-type="string">배수</th>
+            <th data-sort-key="lastseen" class="sortable" data-sort-type="date">최근 접속</th>
+        </tr>
+        </thead>
+        <tbody id="leaderData"></tbody>
+    </table>
+</div>
+
+<div class="update-timestamp">
+    Last Update: 2025-12-09 12:00
+</div>
+
+
+<!-- Add socket.io client CDN before this script (place in head or before closing body) -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="" crossorigin="anonymous"></script>
+
+<script>
+    // Put your server origin here. If the site is served from the same origin as the backend, use '' (empty).
+    const SERVER_ORIGIN = ''; // e.g. 'https://example.com:3000' or '' if same origin
+    const API_BASE = (SERVER_ORIGIN === '') ? '' : SERVER_ORIGIN;
+
+    // Helper render code (adapted from your original)
+    function formatNumber(n) { return (n || 0).toLocaleString(); }
+
+    function renderPlayers(players) {
+      let html = '';
+      players.forEach((p, i) => {
+        const kdDisplay = (typeof p.kd === 'number') ? p.kd.toFixed(2) : '0.00';
+        let rankClass = '';
+        if (i === 0) rankClass = 'rank-gold';
+        else if (i === 1) rankClass = 'rank-silver';
+        else if (i === 2) rankClass = 'rank-bronze';
+
+        const cleaned = (p.uuid_clean) ? p.uuid_clean : (p.uuid || '').replace(/-/g,'');
+        html += `
+          <tr>
+            <td class="${rankClass}">${i+1}</td>
+            <td>
+              <div class="player">
+                <img src="https://render.crafty.gg/3d/bust/${cleaned}?headOnly=true&size=100" alt="${p.name || 'player'} 3D Head">
+                <div>
+                  <span class="player-name">${p.name || cleaned}</span>
+                  <span class="group-name">${(p.group || '')}</span>
+                </div>
+              </div>
+            </td>
+            <td>${formatNumber(p.kills)}</td>
+            <td>${formatNumber(p.deaths)}</td>
+            <td class="kd-ratio">${kdDisplay}</td>
+            <td>${formatNumber(p.xp)}</td>
+            <td>${p.level || 0}</td>
+            <td>${p.killstreak || 0}</td>
+            <td>${p.killstreak_top || 0}</td>
+            <td>${p.multiplier || ''}</td>
+            <td>${(p.lastseen || '').split(' ')[0] || ''}</td>
+          </tr>
+        `;
+      });
+      document.getElementById('leaderData').innerHTML = html;
+      // update header arrows if you keep header logic
+    }
+
+    // Socket.IO realtime
+    const socket = io(API_BASE || undefined);
+
+    socket.on('connect', () => {
+      console.log('Realtime connected to backend, id=', socket.id);
+    });
+
+    socket.on('leaderboard:update', (players) => {
+      // server sends the array - you might want to add name if your DB has `name` column.
+      // If your DB doesn't include `name`, you'll need to modify the server query to pull name.
+      renderPlayers(players);
+      // Update timestamp
+      const now = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const ts = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const el = document.querySelector('.update-timestamp');
+      if (el) el.innerText = 'Last Update: ' + ts;
+    });
+
+    socket.on('disconnect', () => console.log('Realtime disconnected'));
+
+    // Fallback initial load via REST (in case sockets fail)
+    (async function initialLoad(){
+      try {
+        const res = await fetch(API_BASE + '/api/players');
+        if (res.ok) {
+          const j = await res.json();
+          if (j.ok && Array.isArray(j.players)) {
+             renderPlayers(j.players);
+          }
+        }
+      } catch (e) {
+        console.warn('initial load failed', e);
+      }
+    })();
+</script>
+
+
+</body>
+</html>
