@@ -1,18 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MOCK_PLAYERS, Player } from '@/data/mockData';
 import { LeaderboardTable } from '@/components/LeaderboardTable';
 import { PlayerMobileCard } from '@/components/PlayerMobileCard';
 import { PlayerDetailsModal } from '@/components/PlayerDetailsModal';
-import { Search, Trophy, Database, CheckCircle2 } from 'lucide-react';
+import { Search, Trophy, Database, CheckCircle2, Loader2, Wifi, WifiOff } from 'lucide-react';
 import bgImage from '@assets/generated_images/deep_space_nebula_with_cybernetic_grid_overlay.png';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { io } from 'socket.io-client';
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [players, setPlayers] = useState<Player[]>(MOCK_PLAYERS);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isUsingRealData, setIsUsingRealData] = useState(false);
+
+  useEffect(() => {
+    // 1. Initial Fetch via REST API
+    const fetchPlayers = async () => {
+      try {
+        const res = await fetch('/api/players');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && Array.isArray(data.players) && data.players.length > 0) {
+            setPlayers(data.players);
+            setIsUsingRealData(true);
+          }
+        }
+      } catch (error) {
+        console.log("API not available, using mock data");
+      }
+    };
+    
+    fetchPlayers();
+
+    // 2. Real-time updates via Socket.IO
+    const socket = io();
+
+    socket.on('connect', () => {
+      setIsConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setIsConnected(false);
+    });
+
+    socket.on('leaderboard:update', (updatedPlayers: Player[]) => {
+      if (Array.isArray(updatedPlayers) && updatedPlayers.length > 0) {
+        setPlayers(updatedPlayers);
+        setIsUsingRealData(true);
+      }
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
   
-  const filteredPlayers = MOCK_PLAYERS.filter(p => 
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPlayers = players.filter(p => 
+    (p.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -83,6 +129,28 @@ export default function Home() {
             Dominate the arena. Rise through the ranks. Become a legend in the Eternal PvP Chronicles.
           </motion.p>
 
+          {/* Connection Status Indicator */}
+          <motion.div
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 border border-white/10 backdrop-blur-md text-xs font-mono"
+          >
+            {isUsingRealData ? (
+              <>
+                <div className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </div>
+                <span className="text-green-400">LIVE DATA</span>
+              </>
+            ) : (
+              <>
+                <div className="h-2 w-2 rounded-full bg-yellow-500/50"></div>
+                <span className="text-yellow-500/80">PREVIEW MODE</span>
+              </>
+            )}
+          </motion.div>
+
           {/* Search Bar */}
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
@@ -106,8 +174,8 @@ export default function Home() {
         {/* Stats Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: 'Total Kills', value: '1.2M+', color: 'text-primary' },
-            { label: 'Active Players', value: '842', color: 'text-secondary' },
+            { label: 'Total Players', value: players.length.toLocaleString(), color: 'text-primary' },
+            { label: 'System Status', value: isConnected ? 'CONNECTED' : 'STANDBY', color: isConnected ? 'text-green-400' : 'text-yellow-400' },
             { label: 'Server Status', value: 'ONLINE', color: 'text-green-400' },
             { label: 'Current Season', value: '9.5', color: 'text-white' },
           ].map((stat, i) => (
