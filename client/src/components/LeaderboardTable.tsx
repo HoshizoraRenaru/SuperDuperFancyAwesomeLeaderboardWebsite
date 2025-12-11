@@ -6,12 +6,13 @@ import { cn } from '@/lib/utils';
 
 interface LeaderboardTableProps {
   players: Player[];
+  onSelectPlayer: (player: Player) => void;
 }
 
 type SortKey = 'kills' | 'deaths' | 'kd' | 'xp' | 'level' | 'killstreak';
 type SortDirection = 'asc' | 'desc';
 
-export function LeaderboardTable({ players: initialPlayers }: LeaderboardTableProps) {
+export function LeaderboardTable({ players: initialPlayers, onSelectPlayer }: LeaderboardTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('kills');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -96,7 +97,9 @@ export function LeaderboardTable({ players: initialPlayers }: LeaderboardTablePr
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="border-b border-white/5 hover:bg-white/5 transition-colors group"
+                  className="border-b border-white/5 hover:bg-white/10 transition-colors group cursor-pointer"
+                  onClick={() => onSelectPlayer(player)}
+                  whileHover={{ scale: 1.01, backgroundColor: "rgba(255,255,255,0.08)" }}
                 >
                   <td className={cn("p-4 text-center font-display text-2xl font-bold", rankColor)}>
                     {rank}
@@ -124,9 +127,14 @@ export function LeaderboardTable({ players: initialPlayers }: LeaderboardTablePr
                         <span className="font-bold text-white text-lg tracking-wide group-hover:text-primary transition-colors">
                           {player.name}
                         </span>
-                        <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">
-                          {player.group}
-                        </span>
+                        <div className="flex items-center gap-2">
+                           <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">
+                             {player.group}
+                           </span>
+                           <span className="md:hidden text-xs text-secondary font-mono">
+                             Lvl {player.level}
+                           </span>
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -138,13 +146,13 @@ export function LeaderboardTable({ players: initialPlayers }: LeaderboardTablePr
                   </td>
                   <td className="p-4 text-center">
                     <span className={cn(
-                      "font-mono text-xl font-bold px-3 py-1 rounded bg-white/5 border border-white/10",
+                      "font-mono text-xl font-bold px-3 py-1 rounded bg-white/5 border border-white/10 inline-block min-w-[80px]",
                       player.kd >= 5 ? "text-primary border-primary/30 shadow-[0_0_10px_rgba(6,182,212,0.2)]" : "text-white"
                     )}>
                       {player.kd.toFixed(2)}
                     </span>
                   </td>
-                  <td className="p-4 text-center font-mono text-xl text-secondary">
+                  <td className="p-4 text-center font-mono text-xl text-secondary font-bold">
                     {player.level}
                   </td>
                 </motion.tr>

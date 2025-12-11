@@ -1,15 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Crosshair, Skull, Zap, Crown, BarChart3 } from 'lucide-react';
+import { Crosshair, Skull, Zap, Crown, BarChart3, ChevronRight } from 'lucide-react';
 import { Player } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
 interface PlayerMobileCardProps {
   player: Player;
   rank: number;
+  onSelectPlayer: (player: Player) => void;
 }
 
-export function PlayerMobileCard({ player, rank }: PlayerMobileCardProps) {
+export function PlayerMobileCard({ player, rank, onSelectPlayer }: PlayerMobileCardProps) {
   const isTop3 = rank <= 3;
   let rankColor = "text-muted-foreground bg-white/5 border-white/10";
   if (rank === 1) rankColor = "text-yellow-400 bg-yellow-400/10 border-yellow-400/50 shadow-[0_0_15px_rgba(250,204,21,0.2)]";
@@ -21,7 +22,9 @@ export function PlayerMobileCard({ player, rank }: PlayerMobileCardProps) {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="relative w-full overflow-hidden rounded-xl border border-white/10 bg-card/80 backdrop-blur-sm p-4 mb-4"
+      whileTap={{ scale: 0.98 }}
+      onClick={() => onSelectPlayer(player)}
+      className="relative w-full overflow-hidden rounded-xl border border-white/10 bg-card/80 backdrop-blur-sm p-4 mb-4 active:bg-white/10 transition-colors"
     >
       <div className="flex items-center gap-4 mb-4">
         <div className={cn(
@@ -44,13 +47,19 @@ export function PlayerMobileCard({ player, rank }: PlayerMobileCardProps) {
           </div>
         </div>
 
-        <div className="flex flex-col">
-          <span className="font-bold text-white text-lg tracking-wide">
+        <div className="flex flex-col flex-grow">
+          <span className="font-bold text-white text-lg tracking-wide flex items-center justify-between">
             {player.name}
+            <ChevronRight size={16} className="text-white/30" />
           </span>
-          <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">
-            {player.group}
-          </span>
+          <div className="flex items-center gap-2 mt-1">
+             <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">
+              {player.group}
+             </span>
+             <span className="text-xs text-secondary font-mono font-bold">
+               Lvl {player.level}
+             </span>
+          </div>
         </div>
       </div>
 
@@ -67,15 +76,6 @@ export function PlayerMobileCard({ player, rank }: PlayerMobileCardProps) {
             <Skull size={12} /> Deaths
           </div>
           <span className="font-mono text-xl font-bold text-white/70">{player.deaths.toLocaleString()}</span>
-        </div>
-
-        <div className="bg-primary/5 rounded-lg p-3 flex flex-col items-center border border-primary/20 col-span-2">
-          <div className="flex items-center gap-2 text-xs text-primary uppercase mb-1">
-            <Zap size={12} /> K/D Ratio
-          </div>
-          <span className="font-mono text-2xl font-bold text-primary drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">
-            {player.kd.toFixed(2)}
-          </span>
         </div>
       </div>
     </motion.div>
