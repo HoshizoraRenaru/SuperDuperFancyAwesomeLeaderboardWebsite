@@ -4,6 +4,7 @@ import { Crosshair, Skull, Zap, Crown, BarChart3, ChevronRight } from 'lucide-re
 import { Player } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { PlayerName } from '@/components/PlayerName';
+import { getTierFromKills } from '@/lib/tierCalculator';
 
 interface PlayerMobileCardProps {
   player: Player;
@@ -55,7 +56,7 @@ export function PlayerMobileCard({ player, rank, onSelectPlayer }: PlayerMobileC
           </span>
           <div className="flex items-center gap-2 mt-1">
              <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">
-              {player.group}
+              {getTierFromKills(player.kills)}
              </span>
              <span className="text-xs text-secondary font-mono font-bold">
                Lvl {player.level}

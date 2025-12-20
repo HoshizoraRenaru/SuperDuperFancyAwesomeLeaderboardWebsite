@@ -4,6 +4,7 @@ import { Trophy, Skull, Crosshair, Zap, Crown, ChevronUp, ChevronDown } from 'lu
 import { Player } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { PlayerName } from '@/components/PlayerName';
+import { getTierFromKills } from '@/lib/tierCalculator';
 
 interface LeaderboardTableProps {
   players: Player[];
@@ -130,7 +131,7 @@ export function LeaderboardTable({ players: initialPlayers, onSelectPlayer }: Le
                         </span>
                         <div className="flex items-center gap-2">
                            <span className="text-xs text-muted-foreground uppercase tracking-widest bg-white/5 px-2 py-0.5 rounded w-fit">
-                             {player.group}
+                             {getTierFromKills(player.kills)}
                            </span>
                            <span className="md:hidden text-xs text-secondary font-mono">
                              Lvl {player.level}
